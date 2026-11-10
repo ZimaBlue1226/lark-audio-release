@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>音频上新海报</title><link rel="stylesheet" href="poster.css"></head>
+<body><main id="poster"></main><script id="release-data" type="application/json">__RELEASE_JSON__</script><script>
+const release=JSON.parse(document.getElementById('release-data').textContent);
+const root=document.getElementById('poster');
+root.className='poster'+(release.rows.length>1?' multi':'')+(release.items.length===1?' single':'');
+root.style.setProperty('--w',release.width+'px');root.style.setProperty('--h',release.height+'px');
+function text(tag,cls,value){const n=document.createElement(tag);n.className=cls;n.textContent=value;return n}
+let itemIndex=0;
+for(let r=0;r<release.rows.length;r++){
+  const row=document.createElement('div');row.className='poster-row'+(r===release.rows.length-1?' last-row':'');row.style.top=r*release.row_height+'px';row.style.height=release.row_height+'px';
+  for(let col=0;col<release.rows[r];col++){
+    const item=release.items[itemIndex++],panel=document.createElement('article');panel.className='panel';
+    const cover=document.createElement('img');cover.className='cover';cover.src=item.cover;cover.alt=item.title_zh;cover.style.objectPosition=item.cover_position||'50% 50%';panel.append(cover);
+    panel.append(text('div','bottom-mask',''));const cap=document.createElement('div');cap.className='caption';
+    cap.append(text('p','category',String(item.ordinal).padStart(2,'0')+' / '+(item.type==='music'?'SLEEP MUSIC':'SLEEPCAST')));
+    const title=text('h3','en-title',item.title_en);
+    if(item.title_lines){title.textContent='';item.title_lines.forEach((line,i)=>{if(i)title.append(document.createElement('br'));title.append(document.createTextNode(line))})}
+    cap.append(title,text('p','cn-title',item.title_zh),text('p','duration',item.duration),text('p','description',item.description_zh));
+    const tags=document.createElement('ul');tags.className='tags';for(const t of item.tags)tags.append(text('li','',t));cap.append(tags);panel.append(cap);row.append(panel);
+  }
+  root.append(row);
+}
+root.append(text('div','top-mask',''));
+const header=document.createElement('header');header.className='poster-header';const bd=document.createElement('div');bd.className='brand-date';
+bd.append(text('span','brand','Veliso'),text('span','date',release.date.replaceAll('-','.')+(release.page_count>1?' · '+release.page+'/'+release.page_count:'')));
+header.append(bd,text('h2','release-title',release.heading),text('p','release-sub',release.subtitle));root.append(header,text('p','poster-footer',release.footer));
+function align(){for(const row of root.querySelectorAll('.poster-row'))for(const cls of ['en-title','cn-title','description','tags']){const nodes=[...row.querySelectorAll('.'+cls)];const height=Math.max(...nodes.map(n=>n.offsetHeight));nodes.forEach(n=>n.style.height=height+'px')}}
+async function finish(){
+  await Promise.all([...root.querySelectorAll('img')].map(n=>n.decode().catch(()=>{})));await document.fonts.ready;
+  align();const errors=[],warnings=[];
+  for(const [i,panel] of [...root.querySelectorAll('.panel')].entries()){
+    const cover=panel.querySelector('img'),cap=panel.querySelector('.caption'),rect=panel.getBoundingClientRect();
+    if(!cover.naturalWidth)errors.push('封面加载失败: '+release.items[i].title_en);
+    if(cap.getBoundingClientRect().top<rect.top+(panel.parentElement===root.firstElementChild?340:80))errors.push('文字区过高: '+release.items[i].title_en);
+    for(const n of cap.children){
+      if(n.scrollWidth>n.clientWidth+2)errors.push('文字横向溢出: '+release.items[i].title_en+' / '+n.className);
+      const range=document.createRange();range.selectNodeContents(n);const ink=range.getBoundingClientRect();
+      if(ink.left<rect.left||ink.right>rect.right||ink.bottom>rect.bottom)errors.push('文字超出封面: '+release.items[i].title_en+' / '+n.className);
+    }
+    const en=cap.querySelector('.en-title');if(en.offsetHeight/parseFloat(getComputedStyle(en).lineHeight)>2.1)warnings.push('标题超过两行，请检查: '+release.items[i].title_en);
+  }
+  const fonts=[...document.fonts].map(f=>({family:f.family,weight:f.weight,status:f.status}));
+  for(const family of ['Poster PingFang','Poster Noto'])if(!fonts.some(f=>f.family.replaceAll('"','')===family&&f.status==='loaded'))errors.push('字体加载失败: '+family);
+  const report={width:release.width,height:release.height,errors,warnings,fonts};
+  const el=document.createElement('script');el.id='render-report';el.type='application/json';el.textContent=JSON.stringify(report);document.body.append(el);document.documentElement.dataset.ready='true';
+}
+finish().catch(e=>{const n=document.createElement('script');n.id='render-report';n.type='application/json';n.textContent=JSON.stringify({errors:[String(e)],warnings:[]});document.body.append(n)});
+</script></body></html>

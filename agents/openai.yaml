@@ -1,0 +1,4 @@
+interface:
+  display_name: "音频上新通知"
+  short_description: "读取音乐与睡眠播客资料，生成海报和试听文案，私信交付到发起人的飞书"
+  default_prompt: "使用 $lark-audio-release，为我指定的新增音频生成海报和发布文案，完成后发到我自己的飞书。"
