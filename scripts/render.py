@@ -125,13 +125,14 @@ def render(data, output, chrome):
     template = (ASSETS / 'poster.html').read_text(encoding='utf-8')
     music = sum(x['type'] == 'music' for x in data['items']); podcasts = len(data['items'])-music
     subtitle = ' · '.join(filter(None, [f'{music} 首新音乐' if music else '', f'{podcasts} 期睡眠播客' if podcasts else '']))
-    if not (music and podcasts): subtitle += '，邀请你来听'
+    listening_note = '戴上耳机，选一段今晚的陪伴' if podcasts else '戴上耳机，挑一首听听'
+    subtitle = f'{subtitle}，{listening_note}'
     batches = split_items(data['items']); pages = []
     profile = Path(tempfile.mkdtemp(prefix='audio-release-chrome-', dir=output))
     try:
         for number, items in enumerate(batches, 1):
             width, row_height, rows = geometry(len(items), data['layout']); height = row_height*len(rows)
-            payload = dict(date=data['date'], heading=data['heading'], items=items, rows=rows, width=width, height=height, row_height=row_height, page=number, page_count=len(batches), subtitle=subtitle, footer='戴上耳机，选一段今晚的陪伴' if podcasts else '戴上耳机，挑一首听听')
+            payload = dict(date=data['date'], heading=data['heading'], items=items, rows=rows, width=width, height=height, row_height=row_height, page=number, page_count=len(batches), subtitle=subtitle)
             encoded = json.dumps(payload, ensure_ascii=False).replace('<', '\\u003c')
             page = output / f'poster-{number:02d}.html'; png = page.with_suffix('.png')
             page.write_text(template.replace('__RELEASE_JSON__', encoded), encoding='utf-8')
@@ -152,10 +153,13 @@ def render(data, output, chrome):
         try: remove_profile(profile, output)
         except (OSError, ValueError) as exc: print('临时浏览器目录保留: '+str(exc), file=sys.stderr)
     def label(item): return f'试听《{item["title_en"]}》{item["title_zh"]}'
+    invitation = '这周我们上新了睡前音频，欢迎大家来听听。'
     links = [[dict(tag='a', text=label(i), href=i['listen_url'])] for i in data['items']]
-    save_json(output/'links-post.json', {'zh_cn': {'content': links}})
+    content = [[dict(tag='text', text=invitation)], *links]
+    save_json(output/'links-post.json', {'zh_cn': {'content': content}})
     def markdown_text(s): return re.sub(r'([\\\[\]])', r'\\\1', s)
-    message = '\n\n'.join(f'[{markdown_text(label(i))}](<{i["listen_url"]}>)' for i in data['items'])+'\n'
+    link_lines = [f'[{markdown_text(label(i))}](<{i["listen_url"]}>)' for i in data['items']]
+    message = '\n\n'.join([invitation, *link_lines])+'\n'
     (output/'release-message.md').write_text(message, encoding='utf-8')
     manifest = {'date':data['date'], 'count':len(data['items']), 'pages':pages, 'items':[{k:v for k,v in i.items() if k in ('ordinal','type','title_en','title_zh','source_url','listen_url')} for i in data['items']], 'message':'release-message.md', 'post_links':'links-post.json', 'sent':False}
     save_json(output/'manifest.json', manifest)

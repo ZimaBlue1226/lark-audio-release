@@ -86,11 +86,11 @@ Each run writes its files to a separate task directory:
 |---|---|
 | `poster-01.png`, … | Images ready for Feishu. |
 | `poster-01.html`, CSS, covers, and fonts | Local files for reproducing or adjusting the render. |
-| `release-message.md` | Listening links in the same order as the posters. |
-| `links-post.json` | Feishu rich-text link content. |
+| `release-message.md` | An invitation followed by listening links in poster order. |
+| `links-post.json` | The same invitation and links in Feishu rich text. |
 | `manifest.json` | Page dimensions, work order, source links, and rendering checks. |
 
-The message uses labels such as `试听《Soft White Cloud》柔和的白云`. Descriptions stay on the posters.
+The Feishu message opens with a short invitation, followed by the posters and listening links. Links use labels such as `试听《Soft White Cloud》柔和的白云`.
 
 Canvas size adapts to the content. Up to six works fit on one image; larger batches are split into multiple images while preserving order and numbering. A three-work poster defaults to 1740 × 1480 px. Width and height can increase to accommodate longer titles.
 
