@@ -13,7 +13,7 @@ for(let r=0;r<release.rows.length;r++){
   for(let col=0;col<release.rows[r];col++){
     const item=release.items[itemIndex++],panel=document.createElement('article');panel.className='panel';
     const cover=document.createElement('img');cover.className='cover';cover.src=item.cover;cover.alt=item.title_zh;cover.style.objectPosition=item.cover_position||'50% 50%';panel.append(cover);
-    panel.append(text('div','bottom-mask',''));const cap=document.createElement('div');cap.className='caption';
+    const cap=document.createElement('div');cap.className='caption';
     cap.append(text('p','category',String(item.ordinal).padStart(2,'0')+' / '+(item.type==='music'?'SLEEP MUSIC':'SLEEPCAST')));
     const title=text('h3','en-title',item.title_en);
     if(item.title_lines){title.textContent='';item.title_lines.forEach((line,i)=>{if(i)title.append(document.createElement('br'));title.append(document.createTextNode(line))})}
@@ -22,7 +22,6 @@ for(let r=0;r<release.rows.length;r++){
   }
   root.append(row);
 }
-root.append(text('div','top-mask',''));
 const header=document.createElement('header');header.className='poster-header';const bd=document.createElement('div');bd.className='brand-date';
 bd.append(text('span','brand','Veliso'),text('span','date',release.date.replaceAll('-','.')+(release.page_count>1?' · '+release.page+'/'+release.page_count:'')));
 header.append(bd,text('h2','release-title',release.heading),text('p','release-sub',release.subtitle));root.append(header);

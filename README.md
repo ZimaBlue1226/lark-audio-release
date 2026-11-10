@@ -12,7 +12,7 @@ Music, sleep podcasts, and mixed batches are supported. The number of works can 
 
 ![Three music releases in the approved full-bleed layout](./assets/reference.png)
 
-Covers fill the canvas without gaps. Each work shows its number and type, English title, Chinese title, duration, Chinese introduction, and sound or scene tags. Listening links stay in the Feishu text below the images so people can click them.
+Covers fill the canvas without gaps or dark overlays. Each work shows its number and type, English title, Chinese title, duration, Chinese introduction, and sound or scene tags. Listening links stay in the Feishu text below the images so people can click them.
 
 The preview illustrates the layout. Each run uses the selected works and their original covers.
 
