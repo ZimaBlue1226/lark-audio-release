@@ -37,7 +37,7 @@ The repository root is the skill package itself. The skill name, repository name
 2. Verify the initiating user's Feishu identity. The recipient is the current user, never a fixed producer or group.
 3. Read each work's source. Music uses its cover, metadata, and generation notes; podcasts use their cover, metadata, and detailed script.
 4. Prepare concise Chinese introductions and tags, then render posters using the bundled template and fonts.
-5. Inspect the images and rendering reports, and prepare one clickable listening link per work.
+5. Inspect the images and rendering reports, and prepare one clickable listening link followed by the producer credit for each work.
 6. Send the images and links to the initiating user's Feishu private chat and verify delivery.
 
 The AI's work ends at private delivery. Group publishing remains a manual action. A request for a local preview only stops before sending.
@@ -86,11 +86,11 @@ Each run writes its files to a separate task directory:
 |---|---|
 | `poster-01.png`, … | Images ready for Feishu. |
 | `poster-01.html`, CSS, covers, and fonts | Local files for reproducing or adjusting the render. |
-| `release-message.md` | An invitation followed by listening links in poster order. |
-| `links-post.json` | The same invitation and links in Feishu rich text. |
-| `manifest.json` | Page dimensions, work order, source links, and rendering checks. |
+| `release-message.md` | An invitation followed by listening links and producer credits in poster order. |
+| `links-post.json` | The same invitation, links, and producer credits in Feishu rich text. |
+| `manifest.json` | Page dimensions, work order, producer credits, source links, and rendering checks. |
 
-The Feishu message opens with a short invitation, followed by the posters and listening links. Links use labels such as `试听《Soft White Cloud》柔和的白云`.
+The Feishu message opens with a short invitation, followed by the posters and listening links. Each line uses the format `试听《Soft White Cloud》柔和的白云 · 制作人：姓名`. Only the work title is clickable; the producer credit follows as plain text on the same line. Credits come from each work's source or explicit user input. The agent asks for a missing credit instead of assuming the initiator produced every work. Credits appear in the message; the poster's six information layers stay the same.
 
 Canvas size adapts to the content. Up to six works fit on one image; larger batches are split into multiple images while preserving order and numbering. A three-work poster defaults to 1740 × 1480 px. Width and height can increase to accommodate longer titles.
 

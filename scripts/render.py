@@ -36,9 +36,10 @@ def load_release(path):
     for index, item in enumerate(data['items'], 1):
         if item.get('type') not in ('music', 'podcast'):
             raise ValueError(f'第 {index} 件作品的 type 必须为 music 或 podcast')
-        for field in ('title_en', 'title_zh', 'duration', 'description_zh', 'cover', 'source_url', 'listen_url'):
+        for field in ('title_en', 'title_zh', 'producer', 'duration', 'description_zh', 'cover', 'source_url', 'listen_url'):
             if not isinstance(item.get(field), str) or not item[field].strip():
                 raise ValueError(f'第 {index} 件作品缺少 {field}')
+        item['producer'] = item['producer'].strip()
         if not all(https_url(item[k]) for k in ('source_url', 'listen_url')):
             raise ValueError(f'第 {index} 件作品需要有效 HTTPS 资料与试听链接')
         tags = item.get('tags')
@@ -154,14 +155,15 @@ def render(data, output, chrome):
         except (OSError, ValueError) as exc: print('临时浏览器目录保留: '+str(exc), file=sys.stderr)
     def label(item): return f'试听《{item["title_en"]}》{item["title_zh"]}'
     invitation = '这周我们上新了睡前音频，欢迎大家来听听。'
-    links = [[dict(tag='a', text=label(i), href=i['listen_url'])] for i in data['items']]
+    links = [[dict(tag='a', text=label(i), href=i['listen_url']),
+              dict(tag='text', text=f' · 制作人：{i["producer"]}')] for i in data['items']]
     content = [[dict(tag='text', text=invitation)], *links]
     save_json(output/'links-post.json', {'zh_cn': {'content': content}})
-    def markdown_text(s): return re.sub(r'([\\\[\]])', r'\\\1', s)
-    link_lines = [f'[{markdown_text(label(i))}](<{i["listen_url"]}>)' for i in data['items']]
+    def markdown_text(s): return re.sub(r'([\\\[\]*_`~])', r'\\\1', s)
+    link_lines = [f'[{markdown_text(label(i))}](<{i["listen_url"]}>) · 制作人：{markdown_text(i["producer"])}' for i in data['items']]
     message = '\n\n'.join([invitation, *link_lines])+'\n'
     (output/'release-message.md').write_text(message, encoding='utf-8')
-    manifest = {'date':data['date'], 'count':len(data['items']), 'pages':pages, 'items':[{k:v for k,v in i.items() if k in ('ordinal','type','title_en','title_zh','source_url','listen_url')} for i in data['items']], 'message':'release-message.md', 'post_links':'links-post.json', 'sent':False}
+    manifest = {'date':data['date'], 'count':len(data['items']), 'pages':pages, 'items':[{k:v for k,v in i.items() if k in ('ordinal','type','title_en','title_zh','producer','source_url','listen_url')} for i in data['items']], 'message':'release-message.md', 'post_links':'links-post.json', 'sent':False}
     save_json(output/'manifest.json', manifest)
     errors = [e for p in pages for e in p['report'].get('errors', [])]
     print(json.dumps({'ok':not errors,'manifest':str(output/'manifest.json'),'posters':[p['file'] for p in pages],'errors':errors}, ensure_ascii=False))

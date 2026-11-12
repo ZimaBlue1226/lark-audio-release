@@ -4,8 +4,8 @@
 
 | 类别 | 来源 | 取材方式 |
 |---|---|---|
-| 音乐 | https://hcnt3t130lav.feishu.cn/wiki/WLIQwIlupiPJDRkL1amckXYinNB | 按英文或中文名称定位作品章节，读取原封面、成品、介绍、时长及提示词 |
-| 睡眠播客 | https://hcnt3t130lav.feishu.cn/wiki/VXIFwzvv1iuyHOkNiqvcRMWonod | 定位指定播客的作品节点及其成品、封面、详细脚本，内容可能分散在子节点 |
+| 音乐 | https://hcnt3t130lav.feishu.cn/wiki/WLIQwIlupiPJDRkL1amckXYinNB | 按英文或中文名称定位作品章节，读取原封面、成品、制作人署名、介绍、时长及提示词 |
+| 睡眠播客 | https://hcnt3t130lav.feishu.cn/wiki/VXIFwzvv1iuyHOkNiqvcRMWonod | 定位指定播客的作品节点及其成品、制作人署名、封面、详细脚本，内容可能分散在子节点 |
 | 音频源标注 | https://hcnt3t130lav.feishu.cn/wiki/UeCpwYP5kiyTbckFaaKcIPxdnXg | 补充正式中英文名称、简介、声音元素和时长等字段；只读，不在通知任务中改写标注 |
 
 ## 读取与定位
@@ -38,6 +38,8 @@ lark-cli docs +media-download --token <封面资源token> --output ./covers/作�
 命令从本次任务目录运行，CLI 路径参数使用目录内相对路径。保存真实扩展名；如果实际返回 JPEG，不将扩展名伪装成 PNG。文档读取与资源下载失败时按 CLI 的具体提示处理，不以网页截图或别的作品封面顶替。
 
 ## 取材判断
+
+制作人采用本次用户明确提供的姓名或对应作品资料中的制作署名，记录到 `producer`。多人共同制作时按署名顺序用顿号连接。文档创建者、最后编辑者、脚本作者、旁白演员和当前发起人不自动等于音频制作人；不得默认每件作品都是乔志羽制作。查阅对应作品及关联制作资料后仍缺少或存在冲突时，只针对该作品询问，不用占位姓名发布。
 
 音乐的提示词用来帮助理解乐器、音色和氛围，不是需要读者学习的内容。播客的详细脚本帮助提炼场景、动作和聆听意象；遵循当前成品的实际语言、声线与时长。若男女声共用一集入口，作为一个播客项目呈现；只有用户明确把两个版本列为不同上新项目时才拆分。
 
